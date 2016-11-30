@@ -1,5 +1,5 @@
 var socket = io();
-
+var $msgs = jQuery('#msgs');
 socket.on('connect', function(){
     console.log('connected to socket.io server from browser');
 });
@@ -7,6 +7,7 @@ socket.on('connect', function(){
 socket.on('message', function(message){
     console.log('New message:');
     console.log(message.text);
+    $msgs.append('<p>'+ message.text +'</p>');
 });
 
 //handles submitting of new message
