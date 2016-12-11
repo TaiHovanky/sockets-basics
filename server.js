@@ -1,4 +1,5 @@
 var PORT = process.env.PORT || 3000;
+var moment = require('moment');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app); //for http server. Anything the express app listens to
@@ -10,12 +11,14 @@ io.on('connection', function(socket){
 
     socket.on('message', function(message){
         console.log('Message received:' + message.text);
+        message.timestamp = moment().valueOf();
         socket.broadcast.emit('message', message);
     });
     //broadcast.emit sends it to everyone except the sender of that message
 
     socket.emit('message', {
-        text: 'Welcome to the chat app!'
+        text: 'Welcome to the chat app!',
+        timestamp: moment().valueOf()
     });
 }); //telling server to wait for a connection and when it gets one, it prints that message
 //socket is an individual connection to the server
