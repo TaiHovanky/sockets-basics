@@ -5,14 +5,23 @@ var app = express();
 var http = require('http').Server(app); //for http server. Anything the express app listens to
 //the server also listens to
 var io = require('socket.io')(http); //io variable is like the app variable
+var clientInfo = {};
 app.use(express.static(__dirname + '/public'));
 io.on('connection', function(socket){
     console.log('User connected via socket.io');
 
+    socket.on('joinRoom', (req) => {
+        clientInfo[socket.id] = req; 
+        console.log('clientinfo', clientInfo);
+        socket.join(req.room);
+        socket.broadcast.to(req.room).emit('message', {text: 'user just joined!!'})
+    })
+
     socket.on('message', function(message){
-        console.log('Message received:' + message.text);
+        console.log('Message received:' + JSON.stringify(message));
         message.timestamp = moment().valueOf();
-        socket.broadcast.emit('message', message);
+        console.log('msg clientinfo room', clientInfo[socket.id].room);
+        io.to(clientInfo[socket.id].room).emit('message', message);
     });
     //broadcast.emit sends it to everyone except the sender of that message
 
